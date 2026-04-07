@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Intrusion Detector</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; 
+               margin: 50px auto; padding: 20px; background: #0a0a0a; 
+               color: #00ff00; }
+        h1 { color: #00ff00; text-align: center; }
+        .result-box { padding: 20px; border-radius: 10px; 
+                      margin-top: 20px; text-align: center; font-size: 24px; }
+        .attack { background: #ff000033; border: 2px solid red; }
+        .safe { background: #00ff0022; border: 2px solid #00ff00; }
+        button { background: #00ff00; color: black; padding: 12px 30px;
+                 border: none; border-radius: 5px; cursor: pointer; 
+                 font-size: 16px; margin-top: 20px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Network Intrusion Detector</h1>
+    <p class="subtitle">ML-powered cyberattack detection using CICIDS 2017</p>
+
+    <div style="text-align: center;">
+        <button onclick="analyzeRandom()">🔍 Analyze Random Connection</button>
+    </div>
+
+    <div id="result" style="display:none;" class="result-box">
+        <div id="result-text"></div>
+    </div>
+
+    <script>
+        async function analyzeRandom() {
+            // Generate random features for demo
+            const features = Array.from(
+                {length: 52}, () => Math.random() * 100
+            );
+            
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({features: features})
+            });
+            
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            const resultText = document.getElementById('result-text');
+            
+            resultDiv.style.display = 'block';
+            
+            if (data.is_attack) {
+                resultDiv.className = 'result-box attack';
+                resultText.innerHTML = `
+                    🚨 ATTACK DETECTED!<br>
+                    <small>Type: ${data.prediction}</small><br>
+                    <small>Confidence: ${data.confidence}%</small>
+                `;
+            } else {
+                resultDiv.className = 'result-box safe';
+                resultText.innerHTML = `
+                    ✅ SAFE CONNECTION<br>
+                    <small>Type: ${data.prediction}</small><br>
+                    <small>Confidence: ${data.confidence}%</small>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
